@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  spirepostgresql:
+    image: library/postgres:9.6
+    volumes:
+      - "/opt/cloudfleet/data/spirepostgresql:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: spire
+      DB_USER: spire
+      DB_NAME: spire
+  spireredis:
+    image: library/redis
+    volumes:
+      - "/opt/cloudfleet/data/spireredis:/data"
+    command: "redis-server --appendonly yes"
+  spireworker:
+    image: cloudfleet/spire
+    command: "celery -A spire worker -l info"
+    env_file:
+      - "/opt/cloudfleet/config/spire.env"
+  spire:
+    image: cloudfleet/spire
+    env_file:
+      - "/opt/cloudfleet/config/spire.env"
+  landing:
+    image: cloudfleet/landing-page-2
+  nginx:
+    image: bradjonesllc/docker-nginx-letsencrypt
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - gitlab
+      - registry
+      - mattermost
+    environment:
+      CERTS: cloudfleet.io,spire.cloudfleet.io
+      EMAIL: admiralty@cloudfleet.io
+    volumes:
+      - "/opt/cloudfleet/data/ssl:/etc/nginx/ssl"
+      - "/opt/cloudfleet/data/ssl/dhparam:/etc/ssl/dhparam"
+      - "/opt/cloudfleet/data/letsencrypt:/etc/letsencrypt"
+      - "/opt/cloudfleet/generated/nginx/nginx.conf:/etc/nginx/conf.d/ssl.conf"
