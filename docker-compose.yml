@@ -9,6 +9,8 @@ services:
       POSTGRES_USER: spire
       DB_USER: spire
       DB_NAME: spire
+    env_file:
+      - "/opt/cloudfleet/config/spire.env"
   spireredis:
     image: library/redis
     volumes:
@@ -21,6 +23,10 @@ services:
       - "/opt/cloudfleet/config/spire.env"
   spire:
     image: cloudfleet/spire
+    environment:
+      DB_USER: spire
+      DB_NAME: spire
+      DB_HOST: spirepostgresql
     env_file:
       - "/opt/cloudfleet/config/spire.env"
   landing:
