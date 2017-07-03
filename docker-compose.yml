@@ -19,6 +19,10 @@ services:
   spireworker:
     image: cloudfleet/spire
     command: "celery -A spire worker -l info"
+    environment:
+      DB_USER: spire
+      DB_NAME: spire
+      DB_HOST: spirepostgresql
     env_file:
       - "/opt/cloudfleet/config/spire.env"
   spire:
@@ -36,10 +40,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    links:
-      - gitlab
-      - registry
-      - mattermost
     environment:
       CERTS: cloudfleet.io,spire.cloudfleet.io
       EMAIL: admiralty@cloudfleet.io
@@ -47,4 +47,4 @@ services:
       - "/opt/cloudfleet/data/ssl:/etc/nginx/ssl"
       - "/opt/cloudfleet/data/ssl/dhparam:/etc/ssl/dhparam"
       - "/opt/cloudfleet/data/letsencrypt:/etc/letsencrypt"
-      - "/opt/cloudfleet/generated/nginx/nginx.conf:/etc/nginx/conf.d/ssl.conf"
+      - "/opt/cloudfleet/composition/nginx/nginx.conf:/etc/nginx/conf.d/ssl.conf"
