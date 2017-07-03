@@ -35,6 +35,8 @@ services:
       - "/opt/cloudfleet/config/spire.env"
   landing:
     image: cloudfleet/landing-page-2
+  blog:
+    image: cloudfleet/blog
   nginx:
     image: bradjonesllc/docker-nginx-letsencrypt
     ports:
@@ -43,6 +45,8 @@ services:
     environment:
       CERTS: cloudfleet.io,spire.cloudfleet.io
       EMAIL: admiralty@cloudfleet.io
+    volumes_from:
+      blog:ro
     volumes:
       - "/opt/cloudfleet/data/ssl:/etc/nginx/ssl"
       - "/opt/cloudfleet/data/ssl/dhparam:/etc/ssl/dhparam"
